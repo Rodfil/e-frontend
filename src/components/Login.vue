@@ -96,27 +96,23 @@ const showForm = ref(false)
 
       <form action="">
         <div class="input-wrapper-register">
-          <div class="input-field">
-            <input
-              class="input-content"
-              type="text"
-              placeholder="First Name"
-            >
+          <div class="field-wrapper-row">
+            <div class="input-field-row">
+              <input
+                class="input-content-row"
+                type="text"
+                placeholder="First Name"
+              >
+            </div>
+            <div class="input-field-row">
+              <input
+                class="input-content-row"
+                type="text"
+                placeholder="Last Name"
+              >
+            </div>
           </div>
-          <div class="input-field">
-            <input
-              class="input-content"
-              type="text"
-              placeholder="Last Name"
-            >
-          </div>
-          <div class="input-field">
-            <input
-              class="input-content"
-              type="text"
-              placeholder="Last Name"
-            >
-          </div>
+
           <div class="field-wrapper-row">
             <div class="input-field-row">
               <el-dropdown :hide-on-click="false">
@@ -185,26 +181,26 @@ const showForm = ref(false)
 
 .container {
   display: flex;
-  height: 90vh;
-  width: 70%;
+  height: 75vh;
+  width: 61%;
   margin: auto;
   box-shadow: 1px 5px 5px 0px #00000040;
-  margin-top: 2rem;
+  margin-top: 6rem;
 }
 .container-register {
   display: flex;
-  height: 95vh;
+  height: 80vh;
   width: 70%;
   margin: auto;
   box-shadow: 1px 5px 5px 0px #00000040;
-  margin-top: 1rem;
+  margin-top: 5rem;
 }
 .right-content {
   width: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 50px;
+  margin-top: 5px;
 }
 .right-content-register {
   width: 50%;
@@ -290,7 +286,7 @@ const showForm = ref(false)
   display: flex;
 }
 .input-field-row {
-  width: 10vw;
+  width: 12vw;
   height: 7vh;
   box-shadow: 0px 4px 4px 0px #00000040;
   border-radius: 10px;

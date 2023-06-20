@@ -24,8 +24,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10rem;
-    gap: 5rem;
+    margin-top: 5rem;
+    gap: 2.5rem;
 }
 .content-image {
     width: 277px;

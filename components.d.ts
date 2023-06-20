@@ -17,9 +17,12 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     Header: typeof import('./src/components/Header.vue')['default']
+    HomeContent: typeof import('./src/components/HomeContent.vue')['default']
     Login: typeof import('./src/components/Login.vue')['default']
+    MainDashboard: typeof import('./src/components/MainDashboard.vue')['default']
     Register: typeof import('./src/components/Register.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SideMenu: typeof import('./src/components/SideMenu.vue')['default']
   }
 }

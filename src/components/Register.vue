@@ -30,8 +30,8 @@ onMounted(() => {
     ref="container"
     class="container"
   >
-    <div class="form-container sign-up-container" />
-    <div class="form-container sign-in-container">
+    <div class="sign-up-container" />
+    <div class="sign-in-container">
      
     </div>
     <div class="overlay-container">

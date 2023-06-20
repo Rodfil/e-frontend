@@ -30,6 +30,13 @@ const router = createRouter({
             component: () => import(
                 "@/views/DashboardView.vue"
             )
+        },
+        {
+            path: "/Notification",
+            name: "Notification",
+            component: () => import(
+                "@/views/NotificationView.vue"
+            )
         }
     ],
 })

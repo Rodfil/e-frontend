@@ -16,7 +16,7 @@
           <nav>
             <ul>
               <li>
-                <i class="fas fa-home" /><span>Home</span>
+                <i class="fas fa-home" /><router-link to="/Notification"><span>Home</span></router-link>
               </li>
               <li>
                 <i class="fas fa-bell" /><span>Notification</span>
@@ -91,21 +91,58 @@
           </div>
         </div>
       </div>
+      <div class="action-button-wrapper">
+        <div class="button-content">
+          <button>Request Document</button>
+          <button>Upload Document</button>
+          <button>Pay Here</button>
+        </div>
+      </div>
       <div class="booking-summary-wrapper">
         <div class="summary-title">
           <span>Booking Summary</span>
         </div>
-        <table>
-          <tr>
-            <th>dasdasdas</th>
-          </tr>
-        </table>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <th>Document</th>
+              <th>Purpose</th>
+              <th>Date Requested</th>
+              <th>Transaction No</th>
+              <th>Release Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+            <tr>
+              <td>dasdasdas</td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.table-wrapper {
+  padding: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  color: #00000080;
+  border: 4px solid #ebedf2;
+  padding: 1rem;
+  font-weight: 700;
+}
+td {
+  color: #00000080;
+  border: 4px solid #ebedf2;
+  padding: 1rem;
+}
 .summary-title {
   background-color: #542B7C;
   width: 300px;
@@ -116,16 +153,45 @@
   justify-content: center;
   align-items: center;
 }
+
+.button-content {
+  display: flex;
+  gap: 8rem;
+}
+
+.button-content button {
+  width: 198px;
+  height: 48px;
+  border-radius: 10rem;
+  font-size: 18px;
+  color: #342474;
+  background-color: #F48D2D;
+  font-weight: 700;
+  border: none;
+}
 .summary-title span {
   color: #F6F6F6;
 }
 .booking-summary-wrapper {
   background-color: #F6F6F6;
   width: 70vw;
-  height: 50%;
+  height: auto;
   box-shadow: 0px 4px 4px 0px #00000040;
   border-radius: 30px;
   margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.action-button-wrapper {
+  background-color: #F6F6F6;
+  width: 70vw;
+  height: 80px;
+  box-shadow: 0px 4px 4px 0px #00000040;
+  border-radius: 30px;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 hr {
@@ -175,6 +241,7 @@ hr {
 }
 .main-dashboard {
   display: flex;
+
 }
 .frequently-documents-wrapper {
   display: flex;

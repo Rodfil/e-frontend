@@ -1,12 +1,3 @@
 <template>
-  <div class="notification-wrapper">
-    dasdasdas
-  </div>
+  dasdasdas
 </template>
-
-<style scoped>
-.notification-wrapper {
-    display: flex;
-    flex-grow: 1;
-}
-</style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import SideMenu from '@/components/SideMenu.vue'
+import Home from '@/components/HomeContent.vue'
 </script>
 
 <template>
-  <SideMenu />
+  <Home />
 </template>

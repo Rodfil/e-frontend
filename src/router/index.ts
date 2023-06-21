@@ -11,31 +11,38 @@ const router = createRouter({
             )
         },
         {
-            path: "/Login",
-            name: "Login",
+            path: "/login",
+            name: "login",
             component: () => import(
                 "@/views/LoginView.vue"
             )
         },
         {
-            path: "/Register",
-            name: "Register",
+            path: "/register",
+            name: "register",
             component: () => import(
                 "@/views/RegisterView.vue"
             )
         },
         {
-            path: "/Dashboard",
-            name: "Dashboard",
+            path: "/dashboard",
+            name: "dashboard",
             component: () => import(
                 "@/views/DashboardView.vue"
             )
         },
         {
-            path: "/Notification",
-            name: "Notification",
+            path: "/notification",
+            name: "notification",
             component: () => import(
                 "@/views/NotificationView.vue"
+            )
+        },
+        {
+            path: "/profile",
+            name: "profile",
+            component: () => import(
+                "@/views/ProfileView.vue"
             )
         }
     ],

@@ -1,3 +1,26 @@
+<script setup lang="ts">
+import { reactive, ref, onMounted } from 'vue'
+import api from '@/services/apiService'
+
+const user = reactive({
+  firstName: '',
+  userId: null
+})
+
+const userData = ref([])
+
+onMounted(async () => {
+  const userId = sessionStorage.getItem('userId')
+
+  if (userId) {
+    user.userId = userId
+    const response = await api.get(`CreateAccount/${user.userId}`)
+    console.log('response', response.data)
+    userData.value = response.data[0].firstname
+  }
+})
+</script>
+
 <template>
   <div class="main-content">
     <div class="header-profile">
@@ -8,7 +31,7 @@
           alt=""
         >
         <div class="holder-name">
-          <span class="fullname">Rodfil</span>
+          <span class="fullname">{{ userData }}</span>
           <router-link to="/profile">
             <span class="manage-profile">Manage Profile</span>
           </router-link>

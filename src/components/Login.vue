@@ -1,13 +1,77 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { ArrowDown } from '@element-plus/icons-vue'
+import api from '@/services/apiService'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 
-const showForm = ref(false)
+const showLoginForm = ref(true)
+const showRegisterForm = ref(false)
+
+const clickLogin = () => {
+  showLoginForm.value = true
+  showRegisterForm.value = false
+}
+
+const clickRegister = () => {
+  showRegisterForm.value = true
+  showLoginForm.value = false
+}
+
+const formFields = reactive({
+  firstName: '',
+  lastName: '',
+  gender: '',
+  birthdate: '',
+  voterStatus: '',
+  address: '',
+  email: '',
+  password: ''
+})
+
+const loginFields = reactive({
+  email: '',
+  password: ''
+})
+const router = useRouter()
+
+const loginForm = async () => {
+  try {
+    await api.post('CreateAccount/Authenticate', loginFields).then((response) => {
+      if (response.data) {
+        ElMessage({
+          type: 'success',
+          message: 'Successfully Login!'
+        })
+        const userId = response.data.userId
+        sessionStorage.setItem('userId', userId)
+        router.push({
+          path: '/dashboard'
+        })
+      } else {
+        ElMessage({
+          type: 'error',
+          message: 'We cant find your account'
+        })
+      }
+    })
+  } catch (error) {
+    console.log('Error', error)
+  }
+}
+const submitForm = async () => {
+  console.log('the data', formFields)
+  try {
+    await api.post('CreateAccount', formFields)
+  } catch (error) {
+    console.log('Error', error)
+  }
+}
 </script>
 
 <template>
   <div
-    v-if="showForm"
+    v-if="showLoginForm"
     class="container"
   >
     <div class="left-content">
@@ -31,10 +95,11 @@ const showForm = ref(false)
         >
       </div>
 
-      <form action="">
+      <form :model="loginFields">
         <div class="input-wrapper">
           <div class="input-field">
             <input
+              v-model="loginFields.email"
               class="input-content-row"
               type="text"
               placeholder="Email Address"
@@ -42,6 +107,7 @@ const showForm = ref(false)
           </div>
           <div class="input-field">
             <input
+              v-model="loginFields.password"
               class="input-content-row"
               type="password"
               placeholder="Password"
@@ -60,17 +126,20 @@ const showForm = ref(false)
         </div>
       </form>
       <div class="login-button">
-        <button class="icon-button">
+        <button
+          class="icon-button"
+          @click="loginForm()"
+        >
           Login
         </button>
       </div>
       <div class="login-verification">
-        <h2>Don’t have an account yet?</h2> <span>Sign Up</span>
+        <h2>Don’t have an account yet?</h2> <span @click="clickRegister()">Sign Up</span>
       </div>
     </div>
   </div>
   <div
-    v-else
+    v-if="showRegisterForm"
     class="container-register"
   >
     <div class="left-content">
@@ -83,22 +152,18 @@ const showForm = ref(false)
     <div class="right-content-register">
       <div class="right-wrapper">
         <img
-          src="@/assets/img/fetchit-login.png"
-          alt=""
-          class="fetchit-login-register"
-        >
-        <img
           src="@/assets/img/create.png"
           alt=""
           class="create-login"
         >
       </div>
 
-      <form action="">
+      <form :v-model="formFields">
         <div class="input-wrapper-register">
           <div class="field-wrapper-row">
             <div class="input-field-row">
               <input
+                v-model="formFields.firstName"
                 class="input-content-row"
                 type="text"
                 placeholder="First Name"
@@ -106,6 +171,7 @@ const showForm = ref(false)
             </div>
             <div class="input-field-row">
               <input
+                v-model="formFields.lastName"
                 class="input-content-row"
                 type="text"
                 placeholder="Last Name"
@@ -115,20 +181,36 @@ const showForm = ref(false)
 
           <div class="field-wrapper-row">
             <div class="input-field-row">
-              <el-dropdown :hide-on-click="false">
-                <span class="input-content-row">
-                  Gender<el-icon class="el-icon--right"><arrow-down /></el-icon>
-                </span>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>Male</el-dropdown-item>
-                    <el-dropdown-item>Female</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+              <select
+                v-model="formFields.gender"
+                class="input-content-row"
+              >
+                <option
+                  disabled
+                  selected
+                  value=""
+                  hidden
+                  class="input-content"
+                >
+                  Gender
+                </option>
+                <option
+                  value="Male"
+                  class="input-content"
+                >
+                  Male
+                </option>
+                <option
+                  value="Female"
+                  class="input-content"
+                >
+                  Female
+                </option>
+              </select>
             </div>
             <div class="input-field-row">
               <input
+                v-model="formFields.birthdate"
                 class="input-content"
                 type="date"
                 placeholder="BirthDate"
@@ -136,21 +218,53 @@ const showForm = ref(false)
             </div>
           </div>
           <div class="input-field">
-            <el-dropdown :hide-on-click="false">
-              <span class="input-content-row">
-                Registered Votered/ Non-Registered<el-icon class="el-icon--right"><arrow-down /></el-icon>
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item>Registered</el-dropdown-item>
-                  <el-dropdown-item>Non-Registered</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+            <select
+              v-model="formFields.voterStatus"
+              class="input-content-row"
+            >
+              <option
+                disabled
+                selected
+                value=""
+                hidden
+                class="input-content"
+              >
+                Registered Voter/Non-Voter
+              </option>
+              <option
+                value="Registered Voter"
+                class="input-content"
+              >
+                Registered Voter
+              </option>
+              <option
+                value="Non Registered Voter"
+                class="input-content"
+              >
+                Non-Voters
+              </option>
+            </select>
           </div>
 
           <div class="input-field">
             <input
+              v-model="formFields.address"
+              class="input-content-row"
+              type="text"
+              placeholder="Address"
+            >
+          </div>
+          <div class="input-field">
+            <input
+              v-model="formFields.email"
+              class="input-content-row"
+              type="text"
+              placeholder="Email Address"
+            >
+          </div>
+          <div class="input-field">
+            <input
+              v-model="formFields.password"
               class="input-content-row"
               type="password"
               placeholder="Create your password"
@@ -158,6 +272,7 @@ const showForm = ref(false)
           </div>
           <div class="input-field">
             <input
+              v-model="formFields.password"
               class="input-content-row"
               type="password"
               placeholder="Confirm your password"
@@ -166,12 +281,15 @@ const showForm = ref(false)
         </div>
       </form>
       <div class="login-button">
-        <button class="icon-button">
+        <button
+          class="icon-button"
+          @click="submitForm()"
+        >
           Register
         </button>
       </div>
       <div class="login-verification">
-        <h2>Already have an account?</h2> <span>Log In</span>
+        <h2>Already have an account?</h2> <span @click="clickLogin()">Log In</span>
       </div>
     </div>
   </div>
@@ -181,7 +299,7 @@ const showForm = ref(false)
 
 .container {
   display: flex;
-  height: 75vh;
+  height: 550px;
   width: 61%;
   margin: auto;
   box-shadow: 1px 5px 5px 0px #00000040;
@@ -189,11 +307,11 @@ const showForm = ref(false)
 }
 .container-register {
   display: flex;
-  height: 80vh;
+  height: 630px;
   width: 70%;
   margin: auto;
   box-shadow: 1px 5px 5px 0px #00000040;
-  margin-top: 5rem;
+  margin-top: 4rem;
 }
 .right-content {
   width: 50%;
@@ -234,7 +352,7 @@ const showForm = ref(false)
 }
 .hello-login {
   width: 70%;
-  height: 7vh;
+  height: 40px;
   margin-bottom: 2rem;
 }
 .input-wrapper {
@@ -273,7 +391,7 @@ const showForm = ref(false)
 }
 .input-field {
   width: 25vw;
-  height: 7vh;
+  height: 50px;
   box-shadow: 0px 4px 4px 0px #00000040;
   border-radius: 10px;
   align-items: center;
@@ -281,7 +399,7 @@ const showForm = ref(false)
 }
 .input-field-row {
   width: 12vw;
-  height: 7vh;
+  height: 50px;
   box-shadow: 0px 4px 4px 0px #00000040;
   border-radius: 10px;
   align-items: center;
@@ -308,7 +426,7 @@ const showForm = ref(false)
 .login-button {
   margin-top: 2rem;
   width: 25vw;
-  height: 7vh;
+  height: 50px;
   border-radius: 10px;
   background: #FB4C8E;
   display: flex;
@@ -338,11 +456,12 @@ const showForm = ref(false)
   font-size: 15px;
   font-weight: 700;
   color: #542B7C;
+  cursor: pointer;
 }
 .create-login {
   width: 100%;
-  height: 4vh;
-  margin-bottom: 1rem;
+  height: 27px;
+  margin: 1rem;
 }
 
 .sign-in-container {

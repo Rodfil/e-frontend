@@ -1,4 +1,33 @@
 <script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue'
+import api from '@/services/apiService'
+import moment from 'moment'
+
+const getUserData = ref([])
+const user = reactive({
+  userId: null
+})
+
+onMounted(async () => {
+  const userId = sessionStorage.getItem('userId')
+
+  if (userId) {
+    user.userId = userId
+    const response = await api.get(`CreateAccount/${user.userId}`)
+    getUserData.value = response.data.map((item) => {
+      const birthdate = new Date(item.birthdate)
+      const now = new Date()
+      const ageInMilliseconds = now - birthdate
+      const ageInYears = Math.floor(ageInMilliseconds / (365.25 * 24 * 60 * 60 * 1000))
+      return {
+        ...item,
+        age: ageInYears,
+        birthdate: moment(item.birthdate).format('YYYY-MM-DD')
+      }
+    })
+    console.log('Profile data', getUserData.value)
+  }
+})
 
 </script>
 
@@ -25,9 +54,14 @@
             magna aliqua.
           </p>
         </div>
-        <div class="form-fields">
+        <div
+          v-for="data in getUserData"
+          :key="data.userId"
+          class="form-fields"
+        >
           <label for="Email">Email Address</label>
           <input
+            v-model="data.email"
             class="form-input"
             type="text"
             placeholder="Email Address"
@@ -36,11 +70,12 @@
             <label for="Email">Full Name</label>
             <div class="fullname-holder">
               <input
+                v-model="data.firstname"
                 class="firstname-input"
                 type="text"
-                placeholder="Firstname"
               >
               <input
+                v-model="data.lastname"
                 class="lastname-input"
                 type="text"
                 placeholder="Lastname"
@@ -49,20 +84,48 @@
           </div>
           <label for="Email">Address</label>
           <input
+            v-model="data.address"
             class="form-input"
             type="text"
-            placeholder="Email Address"
+            placeholder="Address"
           >
           <div class="fullname-wrapper">
             <div class="fullname-holder">
-              <input
+              <!-- <input
                 class="firstname-input"
                 type="text"
                 placeholder="Gender"
+              > -->
+              <select
+                v-model="data.gender"
+                class="firstname-input"
               >
+                <option
+                  disabled
+                  selected
+                  value=""
+                  hidden
+                  class=""
+                >
+                  Gender
+                </option>
+                <option
+                  value="Male"
+                  class="input-content"
+                >
+                  Male
+                </option>
+                <option
+                  value="Female"
+                  class="input-content"
+                >
+                  Female
+                </option>
+              </select>
               <input
+                v-model="data.birthdate"
                 class="lastname-input"
-                type="text"
+                type="date"
                 placeholder="Birthdate"
               >
             </div>
@@ -70,15 +133,28 @@
           <div class="fullname-wrapper">
             <div class="fullname-holder">
               <input
+                v-model="data.age"
                 class="firstname-input"
                 type="text"
                 placeholder="Age"
               >
-              <input
-                class="lastname-input"
-                type="text"
-                placeholder="Voter Registration Status"
+              <select
+                v-model="data.voterStatus"
+                class="firstname-input"
               >
+                <option
+                  value="Registered Voter"
+                  class="input-content"
+                >
+                  Registered
+                </option>
+                <option
+                  value="Non Registered Voter"
+                  class="input-content"
+                >
+                  Non-Registered
+                </option>
+              </select>
             </div>
           </div>
           <input
@@ -94,7 +170,7 @@
         </h2>
         <div class="image-photo">
           <img
-            src="@/assets/img/left-image.png"
+            src="@/assets/img/organization.jpg"
             alt=""
           >
         </div>
@@ -106,13 +182,15 @@
 <style scoped>
 
 .image-photo {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 .image-photo img {
-    max-width: 50%;
-    height: 166px;
-    border-radius: 50%;
+  width: 150px; /* Adjust the width and height as needed */
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  object-fit: cover;
 }
 .profile-photo {
     padding-left: 2rem;

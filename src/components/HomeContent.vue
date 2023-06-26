@@ -3,11 +3,11 @@ import { reactive, ref, onMounted } from 'vue'
 import api from '@/services/apiService'
 
 const user = reactive({
-  firstName: '',
   userId: null
 })
 
 const userData = ref([])
+const getAllUsers = ref([])
 
 onMounted(async () => {
   const userId = sessionStorage.getItem('userId')
@@ -16,13 +16,20 @@ onMounted(async () => {
     user.userId = userId
     const response = await api.get(`CreateAccount/${user.userId}`)
     console.log('response', response.data)
-    userData.value = response.data[0].firstname
+    userData.value = response.data
   }
+
+  const responseUser = await api.get('CreateAccount')
+  getAllUsers.value = responseUser.data
 })
 </script>
 
 <template>
-  <div class="main-content">
+  <div
+    v-for="data in userData"
+    :key="data.userId"
+    class="main-content"
+  >
     <div class="header-profile">
       <div class="profile-picture">
         <img
@@ -31,91 +38,128 @@ onMounted(async () => {
           alt=""
         >
         <div class="holder-name">
-          <span class="fullname">{{ userData }}</span>
+          <span class="fullname">{{ data.firstname }}</span>
           <router-link to="/profile">
             <span class="manage-profile">Manage Profile</span>
           </router-link>
         </div>
       </div>
     </div>
-    <div class="request-document-wrapper">
-      <div class="frequently-documents-wrapper">
-        <div class="document-content">
-          <span>Frequently Requested Documents</span>
+    <div v-if="data.userType !== 1">
+      <div class="request-document-wrapper">
+        <div class="frequently-documents-wrapper">
+          <div class="document-content">
+            <span>Frequently Requested Documents</span>
+          </div>
+        </div>
+        <div class="requirements-wrapper">
+          <div class="requirements">
+            <h2 class="requirement-name">
+              Barangay Clearance
+            </h2>
+            <div class="requirements-desc">
+              <span>Requirements</span>
+              <span>
+                Lorem ipsum dolor sit amet, consectetur</span>
+            </div>
+            <div class="requirements-desc">
+              <span>Fee</span>
+              <span>
+                Php 12.34</span>
+            </div>
+            <button class="request-button">
+              Request Now!
+            </button>
+          </div>
+          <hr>
+          <div class="requirements">
+            <h2 class="requirement-name">
+              Certificate of Indigency
+            </h2>
+            <div class="requirements-desc">
+              <span>Requirements</span>
+              <span>
+                Lorem ipsum dolor sit amet, consectetur</span>
+            </div>
+            <div class="requirements-desc">
+              <span>Fee</span>
+              <span>
+                Php 12.34</span>
+            </div>
+            <button class="request-button">
+              Request Now!
+            </button>
+          </div>
         </div>
       </div>
-      <div class="requirements-wrapper">
-        <div class="requirements">
-          <h2 class="requirement-name">
-            Barangay Clearance
-          </h2>
-          <div class="requirements-desc">
-            <span>Requirements</span>
-            <span>
-              Lorem ipsum dolor sit amet, consectetur</span>
-          </div>
-          <div class="requirements-desc">
-            <span>Fee</span>
-            <span>
-              Php 12.34</span>
-          </div>
-          <button class="request-button">
-            Request Now!
-          </button>
+      <div class="action-button-wrapper">
+        <div class="button-content">
+          <button>Request Document</button>
+          <button>Upload Document</button>
+          <button>Pay Here</button>
         </div>
-        <hr>
-        <div class="requirements">
-          <h2 class="requirement-name">
-            Certificate of Indigency
-          </h2>
-          <div class="requirements-desc">
-            <span>Requirements</span>
-            <span>
-              Lorem ipsum dolor sit amet, consectetur</span>
-          </div>
-          <div class="requirements-desc">
-            <span>Fee</span>
-            <span>
-              Php 12.34</span>
-          </div>
-          <button class="request-button">
-            Request Now!
-          </button>
+      </div>
+      <div class="booking-summary-wrapper">
+        <div class="summary-title">
+          <span>Booking Summary</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <th>Document</th>
+              <th>Purpose</th>
+              <th>Date Requested</th>
+              <th>Transaction No</th>
+              <th>Release Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+            <tr>
+              <td>dasdasdas</td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>
-    <div class="action-button-wrapper">
-      <div class="button-content">
-        <button>Request Document</button>
-        <button>Upload Document</button>
-        <button>Pay Here</button>
-      </div>
-    </div>
-    <div class="booking-summary-wrapper">
-      <div class="summary-title">
-        <span>Booking Summary</span>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <tr>
-            <th>Document</th>
-            <th>Purpose</th>
-            <th>Date Requested</th>
-            <th>Transaction No</th>
-            <th>Release Date</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-          <tr>
-            <td>dasdasdas</td>
-          </tr>
-        </table>
+    <div v-else>
+      <div class="booking-summary-wrapper">
+        <div class="summary-title">
+          <span>Booking Summary</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Age</th>
+              <th>Email Address</th>
+              <th>Gender</th>
+              <th></th>
+              <th></th>
+            </tr>
+            <tr
+              v-for="users in getAllUsers"
+              :key="users.usersId"
+            >
+              <td>{{ users.firstname }}</td>
+              <td>{{ users.lastname }}</td>
+              <td>{{ users.age }}</td>
+              <td>{{ users.email }}</td>
+              <td>{{ users.gender }}</td>
+              <td>Approve</td>
+              <td>Disapprove</td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
   <style scoped>
+  .row-wrapper {
+    width: 100%;
+  }
   .table-wrapper {
     padding: 1rem;
   }
@@ -126,13 +170,15 @@ onMounted(async () => {
   }
   th {
     color: #00000080;
-    border: 4px solid #ebedf2;
+    border-bottom: 4px solid #ebedf2;
     padding: 1rem;
+    text-align: left;
     font-weight: 700;
+    background-color: rgba(234, 241, 255, 0.74);
   }
   td {
     color: #00000080;
-    border: 4px solid #ebedf2;
+    border-bottom: 4px solid #ebedf2;
     padding: 1rem;
   }
   .summary-title {

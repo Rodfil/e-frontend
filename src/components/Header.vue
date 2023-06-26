@@ -22,9 +22,11 @@
       </li>
       <div class="right-menu">
         <li>
-          <h2 class="login">
-            Log In
-          </h2>
+          <router-link to="/login">
+            <h2 class="login">
+              Log In
+            </h2>
+          </router-link>
         </li>
         <li>
           <div class="started-wrapper">
@@ -56,6 +58,11 @@
     font-weight: 500;
     font-size: 16px;
     color: #00000080;
+    cursor: pointer;
+}
+.right-menu a {
+  text-decoration: none;
+  color: #00000080;
 }
 
 .started-wrapper {
@@ -64,7 +71,5 @@
   background-color: #FFFFFF;
   box-shadow: 0px 4px 4px 0px #00000040;
 }
-.get-started {
 
-}
 </style>

@@ -1,9 +1,27 @@
 <script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue'
+import api from '@/services/apiService'
+
+const user = reactive({
+  userType: ''
+})
+
+const getAllUsers = async () => {
+  const response = await api.get('CreateAccount')
+  user.userType = response.data
+  console.log('usertype', user.userType)
+}
+
+onMounted(() => {
+  getAllUsers()
+})
 
 </script>
 
 <template>
-  <div class="main-dashboard">
+  <div
+    class="main-dashboard"
+  >
     <div class="sidebar">
       <div class="sidebar-wrapper">
         <div class="sidebar-logo">

@@ -10,10 +10,9 @@ module.exports = {
     'plugin:vue/vue3-recommended'
   ],
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: './tsconfig.json'
-
+    parser: '@typescript-eslint/parser',
+    ecmaVersion: 2021,
+    sourceType: 'module'
   },
   plugins: [
     'vue'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import api from '@/services/apiService'
-import { ElMessage } from 'element-plus'
+import UserList from '@/components/UserList.vue'
 
 const user = reactive({
   userId: null
@@ -16,51 +16,12 @@ const getUsersById = async () => {
   if (userId) {
     user.userId = userId
     const response = await api.get(`CreateAccount/${user.userId}`)
-    console.log('response', response.data)
+    console.log('login user', response.data)
     userData.value = response.data
   }
 }
-const getUserData = async () => {
-  const responseUser = await api.get('CreateAccount')
-  console.log('user', responseUser.data)
-  getAllUsers.value = responseUser.data.map((item: any) => {
-    const birthdate = new Date(item.birthdate)
-    const now = new Date()
-    const ageInMilliseconds = now - birthdate
-    const ageInYears = Math.floor(ageInMilliseconds / (365.25 * 24 * 60 * 60 * 1000))
-    return {
-      ...item,
-      age: ageInYears
-    }
-  })
-}
 
-const approveUser = async (userId: any) => {
-  console.log('userid', userId)
-  const headers = { 'Content-Type': 'multipart/form-data' }
-  const isApproved = await api.put(`CreateAccount/${userId}/ApproveDisapproved/${true}`, headers)
-  if (isApproved) {
-    ElMessage({
-      type: 'success',
-      message: 'Successfully approved request!'
-    })
-  }
-}
-
-const disapproveUser = async (userId: any) => {
-  console.log('userid', userId)
-  const headers = { 'Content-Type': 'multipart/form-data' }
-  const isApproved = await api.put(`CreateAccount/${userId}/ApproveDisapproved/${false}`, headers)
-  if (isApproved) {
-    ElMessage({
-      type: 'success',
-      message: 'Successfully approved request!'
-    })
-  }
-}
-
-onMounted(async () => {
-  getUserData()
+onMounted(() => {
   getUsersById()
 })
 </script>
@@ -71,137 +32,96 @@ onMounted(async () => {
     :key="data.userId"
     class="main-content"
   >
-    <div class="header-profile">
-      <div class="profile-picture">
-        <img
-          src="@/assets/img/left-image.png"
-          P
-          alt=""
-        >
-        <div class="holder-name">
-          <span class="fullname">{{ data.firstname }}</span>
-          <router-link to="/profile">
-            <span class="manage-profile">Manage Profile</span>
-          </router-link>
-        </div>
-      </div>
-    </div>
-    <div v-if="data.userType !== 1">
-      <div class="request-document-wrapper">
-        <div class="frequently-documents-wrapper">
-          <div class="document-content">
-            <span>Frequently Requested Documents</span>
-          </div>
-        </div>
-        <div class="requirements-wrapper">
-          <div class="requirements">
-            <h2 class="requirement-name">
-              Barangay Clearance
-            </h2>
-            <div class="requirements-desc">
-              <span>Requirements</span>
-              <span>
-                Lorem ipsum dolor sit amet, consectetur</span>
-            </div>
-            <div class="requirements-desc">
-              <span>Fee</span>
-              <span>
-                Php 12.34</span>
-            </div>
-            <button class="request-button">
-              Request Now!
-            </button>
-          </div>
-          <hr>
-          <div class="requirements">
-            <h2 class="requirement-name">
-              Certificate of Indigency
-            </h2>
-            <div class="requirements-desc">
-              <span>Requirements</span>
-              <span>
-                Lorem ipsum dolor sit amet, consectetur</span>
-            </div>
-            <div class="requirements-desc">
-              <span>Fee</span>
-              <span>
-                Php 12.34</span>
-            </div>
-            <button class="request-button">
-              Request Now!
-            </button>
+    <div>
+      <div class="header-profile">
+        <div class="profile-picture">
+          <img
+            src="@/assets/img/left-image.png"
+            P
+            alt=""
+          >
+          <div class="holder-name">
+            <span class="fullname">{{ data.firstname }}</span>
+            <router-link to="/profile">
+              <span class="manage-profile">Manage Profile</span>
+            </router-link>
           </div>
         </div>
       </div>
-      <div class="action-button-wrapper">
-        <div class="button-content">
-          <button>Request Document</button>
-          <button>Upload Document</button>
-          <button>Pay Here</button>
+      <div>
+        <div class="request-document-wrapper">
+          <div class="frequently-documents-wrapper">
+            <div class="document-content">
+              <span>Frequently Requested Documents</span>
+            </div>
+          </div>
+          <div class="requirements-wrapper">
+            <div class="requirements">
+              <h2 class="requirement-name">
+                Barangay Clearance
+              </h2>
+              <div class="requirements-desc">
+                <span>Requirements</span>
+                <span>
+                  Lorem ipsum dolor sit amet, consectetur</span>
+              </div>
+              <div class="requirements-desc">
+                <span>Fee</span>
+                <span>
+                  Php 12.34</span>
+              </div>
+              <button class="request-button">
+                Request Now!
+              </button>
+            </div>
+            <hr>
+            <div class="requirements">
+              <h2 class="requirement-name">
+                Certificate of Indigency
+              </h2>
+              <div class="requirements-desc">
+                <span>Requirements</span>
+                <span>
+                  Lorem ipsum dolor sit amet, consectetur</span>
+              </div>
+              <div class="requirements-desc">
+                <span>Fee</span>
+                <span>
+                  Php 12.34</span>
+              </div>
+              <button class="request-button">
+                Request Now!
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="booking-summary-wrapper">
-        <div class="summary-title">
-          <span>Booking Summary</span>
+        <div class="action-button-wrapper">
+          <div class="button-content">
+            <button>Request Document</button>
+            <button>Upload Document</button>
+            <button>Pay Here</button>
+          </div>
         </div>
-        <div class="table-wrapper">
-          <table>
-            <tr>
-              <th>Document</th>
-              <th>Purpose</th>
-              <th>Date Requested</th>
-              <th>Transaction No</th>
-              <th>Release Date</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-            <tr>
-              <td>dasdasdas</td>
-            </tr>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div v-else>
-      <div class="booking-summary-wrapper">
-        <div class="summary-title">
-          <span>User List</span>
-        </div>
-        <div class="table-wrapper">
-          <table>
-            <tr>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Age</th>
-              <th>Email Address</th>
-              <th>Gender</th>
-              <th />
-            </tr>
-            <tr
-              v-for="users in getAllUsers"
-              :key="users.userId"
-            >
-              <td>{{ users.firstname }}</td>
-              <td>{{ users.lastname }}</td>
-              <td>{{ users.age }}</td>
-              <td>{{ users.email }}</td>
-              <td>{{ users.gender }}</td>
-              <td>
-                <el-button
-                  type="primary"
-                  @click="approveUser(users.userId)"
-                >
-                  Approve
-                </el-button>
-                <el-button
-                  type="danger"
-                  @click="disapproveUser(users.userId)"
-                >
-                  Disapprove
-                </el-button>
-              </td>
-            </tr>
-          </table>
+        <div class="booking-summary-wrapper">
+          <div class="summary-title">
+            <span>Booking Summary</span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <tr>
+                <th>Document</th>
+                <th>Purpose</th>
+                <th>Date Requested</th>
+                <th>Transaction No</th>
+                <th>Release Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+              <tr>
+                <td>dasdasdas</td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
     </div>

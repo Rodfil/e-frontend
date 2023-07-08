@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ref, reactive, onMounted } from 'vue'
 import api from '@/services/apiService'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -8,6 +7,12 @@ import { useRouter } from 'vue-router'
 const showLoginForm = ref(true)
 const showRegisterForm = ref(false)
 
+onMounted(() => {
+  const loginButton = ref(null)
+  if (loginButton.value) {
+    loginButton.value.focus()
+  }
+})
 const clickLogin = () => {
   showLoginForm.value = true
   showRegisterForm.value = false
@@ -103,6 +108,7 @@ const submitForm = async () => {
               class="input-content-row"
               type="text"
               placeholder="Email Address"
+              @keyup.enter="loginForm()"
             >
           </div>
           <div class="input-field">
@@ -111,6 +117,7 @@ const submitForm = async () => {
               class="input-content-row"
               type="password"
               placeholder="Password"
+              @keyup.enter="loginForm()"
             >
           </div>
           <div class="password-validtation">
@@ -127,6 +134,7 @@ const submitForm = async () => {
       </form>
       <div class="login-button">
         <button
+          ref="loginButton"
           class="icon-button"
           @click="loginForm()"
         >

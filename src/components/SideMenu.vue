@@ -3,13 +3,19 @@ import { ref, reactive, onMounted } from 'vue'
 import api from '@/services/apiService'
 
 const user = reactive({
-  userType: ''
+  userId: null,
+  userType: null
 })
 
 const getAllUsers = async () => {
-  const response = await api.get('CreateAccount')
-  user.userType = response.data
-  console.log('usertype', user.userType)
+  const userId = sessionStorage.getItem('userId')
+
+  if (userId) {
+    user.userId = userId
+    const response = await api.get(`CreateAccount/${user.userId}`)
+    console.log('login user', response.data)
+    user.userType = response.data.find(item => item.userType === 1)
+  }
 }
 
 onMounted(() => {
@@ -20,6 +26,7 @@ onMounted(() => {
 
 <template>
   <div
+    v-if="user.userType"
     class="main-dashboard"
   >
     <div class="sidebar">
@@ -34,18 +41,66 @@ onMounted(() => {
           <nav>
             <ul>
               <li>
-                <i class="fas fa-home" />
+                <i
+                  class="fas fa-file"
+                />
+                <router-link to="/documents">
+                  <span>Documents</span>
+                </router-link>
+              </li>
+              <li>
+                <i class="fas fa-users" /><router-link
+                  to="/users"
+                >
+                  <span>Users</span>
+                </router-link>
+              </li>
+              <li>
+                <i class="fas fa-archive" />
+                <span>Inventory</span>
+              </li>
+              <li>
+                <i class="fas fa-book" /><span>Add Admin</span>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    v-else
+    class="main-dashboard"
+  >
+    <div class="sidebar">
+      <div class="sidebar-wrapper">
+        <div class="sidebar-logo">
+          <img
+            src="@/assets/img/sidebar-logo.png"
+            alt=""
+          >
+        </div>
+        <div class="sidebar-menu">
+          <nav>
+            <ul>
+              <li>
+                <i
+                  class="fas fa-home"
+                />
                 <router-link to="/Dashboard">
                   <span>Home</span>
                 </router-link>
               </li>
               <li>
-                <i class="fas fa-bell" /><router-link to="/Notification">
+                <i class="fas fa-bell" /><router-link
+                  to="/Notification"
+                >
                   <span>Notification</span>
                 </router-link>
               </li>
               <li>
-                <i class="fas fa-star" /><span>Feedback</span>
+                <i class="fas fa-star" />
+                <span>Feedback</span>
               </li>
               <li>
                 <i class="fas fa-book" /><span>About Us</span>

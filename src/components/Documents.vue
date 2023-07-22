@@ -3,6 +3,14 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '@/services/apiService'
 
+const documentDialog = ref(false)
+const isEdit = ref(false)
+const showPurpose = ref(false)
+const showDocument = ref(true)
+const formLabelWidth = '140px'
+const tilteModal = ref('')
+const listOfDocuments = ref([])
+const listOfPurpose = ref([])
 const documentForm = reactive({
   documentName: '',
   documentId: null,
@@ -10,16 +18,31 @@ const documentForm = reactive({
   isVoter: false,
   nonVoter: false
 })
-const formLabelWidth = '140px'
-const tilteModal = ref('')
-const documentDialog = ref(false)
-const isEdit = ref(false)
-const listOfDocuments = ref([])
+const purposeForm = reactive({
+  description: '',
+  documentId: null,
+  purpose: [{ description: '' }]
+})
 const clearFields = () => {
   documentForm.documentName = ''
   documentForm.price = ''
   documentForm.isVoter = false
   documentForm.nonVoter = false
+}
+const showDocumentTable = () => {
+  showDocument.value = true
+}
+
+const addRow = () => {
+  const hasEmptyRow = listOfPurpose.value.some((desc) => desc.description === '')
+
+  if (!hasEmptyRow) {
+    listOfPurpose.value.push({ description: '' })
+  }
+}
+
+const removeRow = (index: any) => {
+  listOfPurpose.value.splice(index, 1)
 }
 
 const addDocument = async () => {
@@ -38,6 +61,43 @@ const addDocument = async () => {
     console.log(error)
   }
 }
+
+const handlePurpose = (row: any) => {
+  console.log(row.documentId)
+  purposeForm.documentId = row.documentId
+  showPurpose.value = true
+  showDocument.value = false
+  getSpecficPurpose()
+}
+
+const getSpecficPurpose = async () => {
+  const response = await api.get(`Documents/Purpose/${purposeForm.documentId}`)
+  listOfPurpose.value = response.data
+  console.log('list of purpose', listOfPurpose.value)
+}
+const addPurpose = async () => {
+  const listOfDescription = listOfPurpose.value.filter((desc) => desc.description !== '').map(desc => {
+    return { description: desc.description }
+  })
+  const formData = {
+    description: listOfDescription,
+    documentId: purposeForm.documentId
+  }
+
+  try {
+    console.log('formData', formData)
+    const response = await api.post('Documents/Purpose', formData)
+    if (response) {
+      ElMessage({
+        type: 'success',
+        message: 'Successfully Added!'
+      })
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const handleAdd = () => {
   documentDialog.value = true
   tilteModal.value = 'Add'
@@ -107,14 +167,29 @@ const getAllDocuments = async () => {
   }
 }
 
-onMounted(async () => {
+const loadAll = async () => {
   getAllDocuments()
+}
+
+onMounted(async () => {
+  loadAll()
 })
 </script>
 
 <template>
   <div class="main-content">
     <div
+      class="back-wrapper"
+      @click="showDocumentTable()"
+    >
+      <i
+        class="fa fa-arrow-left"
+        aria-hidden="true"
+      />
+    </div>
+
+    <div
+      v-if="showDocument"
       class="user-summary-wrapper"
     >
       <div class="header-documents">
@@ -161,10 +236,79 @@ onMounted(async () => {
                 >
                   Delete
                 </el-button>
+                <el-button
+                  type="primary"
+                  @click="handlePurpose(documents)"
+                >
+                  Add Purpose
+                </el-button>
               </td>
             </tr>
           </template>
         </table>
+      </div>
+    </div>
+    <div
+      v-else
+      class="user-summary-wrapper"
+    >
+      <div class="header-documents">
+        <div class="summary-title">
+          <span>Purpose List</span>
+        </div>
+        <!-- <div class="add-documents-wrapper">
+          <el-button
+            type="primary"
+            @click="handleAdd()"
+          >
+            Add Documents
+          </el-button>
+        </div> -->
+      </div>
+      <div class="header-purpose-content">
+        <div class="button-wrapper-purpose">
+          <el-button
+            type="primary"
+            @click="addRow()"
+          >
+            + Add Row
+          </el-button>
+        </div>
+
+        <div class="description-content">
+          <div class="input-container">
+            <template
+              v-for="(desc, index) in listOfPurpose"
+              :key="index"
+            >
+              <div class="button-header">
+                <input
+                  v-model="desc.description"
+                  class="purpose-description"
+                  type="text"
+                >
+                <div class="button-holder">
+                  <el-button
+                    type="danger"
+                    class="remove-button"
+                    @click="removeRow(index)"
+                  >
+                    Remove
+                  </el-button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="save-purpose-wrapper">
+          <el-button
+            type="primary"
+            class="save-purpose"
+            @click="addPurpose()"
+          >
+            Save
+          </el-button>
+        </div>
       </div>
     </div>
   </div>
@@ -219,6 +363,54 @@ onMounted(async () => {
 
 <style scoped>
 
+.save-purpose-wrapper {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
+.button-wrapper-purpose {
+  margin-bottom: 1rem;
+}
+
+.button-header {
+  display: flex;
+}
+
+.button-holder {
+  display: flex;
+  justify-content: flex-end;
+}
+.remove-button {
+  position: absolute;
+  margin: 1rem;
+}
+
+.purpose-description {
+  outline: none;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: #ffff;
+  width: 63vw;
+  border-radius: 1rem;
+}
+.header-purpose-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0 0 2rem;
+
+}
+.fa-arrow-left {
+  color: #F6F6F6 !important;
+}
+.back-wrapper {
+  position: absolute;
+  cursor: pointer;
+  top: 3rem;
+  left: 22rem;
+  background: #F48D2D;
+  padding: 0.5rem 0.5rem;
+}
 .header-documents {
   display: flex;
   justify-content: space-between;

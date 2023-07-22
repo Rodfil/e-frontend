@@ -50,9 +50,11 @@ const loginForm = async () => {
         })
         const userId = response.data.userId
         sessionStorage.setItem('userId', userId)
-        router.push({
-          path: '/dashboard'
-        })
+        if (response.data.userType === 1) {
+          router.push('/documents')
+        } else {
+          router.push('/dashboard')
+        }
       } else {
         ElMessage({
           type: 'error',

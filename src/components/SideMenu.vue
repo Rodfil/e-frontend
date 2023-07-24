@@ -126,8 +126,9 @@ onMounted(() => {
     transition: all 0.5s linear;
 }
 .sidebar-wrapper {
-    display: flex;
-    flex-direction: column;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 .sidebar-logo {
     margin-top: 2rem;

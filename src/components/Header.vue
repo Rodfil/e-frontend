@@ -43,6 +43,7 @@
 <style scoped>
 .header-menu {
     display: flex;
+    padding: 2rem;
 }
 .header-content {
     display: flex;
@@ -66,10 +67,14 @@
 }
 
 .started-wrapper {
+  margin-top: -1rem;
   border-radius: 20px;
-  padding: 1px 20px 1px 20px;
   background-color: #FFFFFF;
   box-shadow: 0px 4px 4px 0px #00000040;
+}
+
+.get-started {
+  padding: 0.9rem;
 }
 
 </style>

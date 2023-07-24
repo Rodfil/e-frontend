@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '@/services/apiService'
 
@@ -11,6 +11,13 @@ const formLabelWidth = '140px'
 const tilteModal = ref('')
 const listOfDocuments = ref([])
 const listOfPurpose = ref([])
+const purposeForm = reactive({
+  description: '',
+  id: null,
+  documentId: null,
+  purpose: [{ description: '' }]
+})
+
 const documentForm = reactive({
   documentName: '',
   documentId: null,
@@ -18,11 +25,7 @@ const documentForm = reactive({
   isVoter: false,
   nonVoter: false
 })
-const purposeForm = reactive({
-  description: '',
-  documentId: null,
-  purpose: [{ description: '' }]
-})
+
 const clearFields = () => {
   documentForm.documentName = ''
   documentForm.price = ''
@@ -34,15 +37,16 @@ const showDocumentTable = () => {
 }
 
 const addRow = () => {
-  const hasEmptyRow = listOfPurpose.value.some((desc) => desc.description === '')
-
-  if (!hasEmptyRow) {
-    listOfPurpose.value.push({ description: '' })
-  }
+  purposeForm.purpose.push({ description: '' })
 }
 
-const removeRow = (index: any) => {
-  listOfPurpose.value.splice(index, 1)
+const removeRow = async (desc: any, index: any) => {
+  if (desc.id) {
+    purposeForm.id = desc.id
+    await deleteSpecificPurpose()
+  } else {
+    purposeForm.purpose.splice(index, 1)
+  }
 }
 
 const addDocument = async () => {
@@ -63,35 +67,41 @@ const addDocument = async () => {
 }
 
 const handlePurpose = (row: any) => {
-  console.log(row.documentId)
   purposeForm.documentId = row.documentId
   showPurpose.value = true
   showDocument.value = false
   getSpecficPurpose()
 }
-
 const getSpecficPurpose = async () => {
   const response = await api.get(`Documents/Purpose/${purposeForm.documentId}`)
   listOfPurpose.value = response.data
   console.log('list of purpose', listOfPurpose.value)
 }
-const addPurpose = async () => {
-  const listOfDescription = listOfPurpose.value.filter((desc) => desc.description !== '').map(desc => {
+const deleteSpecificPurpose = async () => {
+  const response = await api.delete(`Documents/Purpose/${purposeForm.id}`)
+  getSpecficPurpose()
+}
+const updateSpecificPurpose = async () => {
+  const response = await api.put(`Documents/Purpose/${purposeForm.id}`)
+}
+
+const savePurpose = async () => {
+  const isPurpose = purposeForm.purpose.map((desc) => {
     return { description: desc.description }
   })
   const formData = {
-    description: listOfDescription,
+    description: isPurpose,
     documentId: purposeForm.documentId
   }
-
   try {
-    console.log('formData', formData)
     const response = await api.post('Documents/Purpose', formData)
     if (response) {
       ElMessage({
         type: 'success',
-        message: 'Successfully Added!'
+        message: 'Successfully saved!'
       })
+      purposeForm.purpose = []
+      getSpecficPurpose()
     }
   } catch (error) {
     console.log(error)
@@ -101,8 +111,8 @@ const addPurpose = async () => {
 const handleAdd = () => {
   documentDialog.value = true
   tilteModal.value = 'Add'
-  clearFields()
   isEdit.value = false
+  clearFields()
 }
 
 const handleEdit = (documents: any) => {
@@ -291,7 +301,28 @@ onMounted(async () => {
                   <el-button
                     type="danger"
                     class="remove-button"
-                    @click="removeRow(index)"
+                    @click="removeRow(desc, index)"
+                  >
+                    Remove
+                  </el-button>
+                </div>
+              </div>
+            </template>
+            <template
+              v-for="(desc, index) in purposeForm.purpose"
+              :key="index"
+            >
+              <div class="button-header">
+                <input
+                  v-model="desc.description"
+                  class="purpose-description"
+                  type="text"
+                >
+                <div class="button-holder">
+                  <el-button
+                    type="danger"
+                    class="remove-button"
+                    @click="removeRow(desc, index)"
                   >
                     Remove
                   </el-button>
@@ -304,7 +335,7 @@ onMounted(async () => {
           <el-button
             type="primary"
             class="save-purpose"
-            @click="addPurpose()"
+            @click="savePurpose()"
           >
             Save
           </el-button>
@@ -392,6 +423,7 @@ onMounted(async () => {
   margin-bottom: 1.5rem;
   border: #ffff;
   width: 63vw;
+  box-shadow: 0px 4px 4px 0px #00000040;
   border-radius: 1rem;
 }
 .header-purpose-content {

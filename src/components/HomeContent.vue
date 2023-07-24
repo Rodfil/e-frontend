@@ -223,6 +223,7 @@ hr {
 }
 .requirements-wrapper {
   width: 100%;
+  padding: 0.9rem;
 }
 .requirement-name {
   font-size: 25px;
@@ -248,6 +249,7 @@ hr {
   margin-left: 2rem;
   align-items: center;
   gap: 4rem;
+  margin: 1rem;
 }
 .frequently-documents-wrapper {
   display: flex;

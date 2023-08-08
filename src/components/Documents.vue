@@ -5,6 +5,7 @@ import api from '@/services/apiService'
 
 const documentDialog = ref(false)
 const isEdit = ref(false)
+const isUpdatePurpose = ref(false)
 const showPurpose = ref(false)
 const showDocument = ref(true)
 const formLabelWidth = '140px'
@@ -40,15 +41,6 @@ const addRow = () => {
   purposeForm.purpose.push({ description: '' })
 }
 
-const removeRow = async (desc: any, index: any) => {
-  if (desc.id) {
-    purposeForm.id = desc.id
-    await deleteSpecificPurpose()
-  } else {
-    purposeForm.purpose.splice(index, 1)
-  }
-}
-
 const addDocument = async () => {
   try {
     const response = await api.post('Documents', documentForm)
@@ -81,8 +73,35 @@ const deleteSpecificPurpose = async () => {
   const response = await api.delete(`Documents/Purpose/${purposeForm.id}`)
   getSpecficPurpose()
 }
+
+const removeRow = async (desc: any, index: any) => {
+  if (desc.id) {
+    purposeForm.id = desc.id
+    await deleteSpecificPurpose()
+  } else {
+    purposeForm.purpose.splice(index, 1)
+  }
+}
+
+const updateSpecificRow = async (index: any) => {
+  console.log('purpose id', index.id)
+  isUpdatePurpose.value = true
+  console.log('is edit', isUpdatePurpose.value)
+  purposeForm.id = index.id
+  purposeForm.purpose.map((purpose) => {
+    return { description: purpose.description }
+  })
+}
+
 const updateSpecificPurpose = async () => {
-  const response = await api.put(`Documents/Purpose/${purposeForm.id}`)
+  const specificPurpose = purposeForm.purpose.map((purpose) => {
+    return { description: purpose.description }
+  })
+  const response = await api.put(`Documents/Purpose/${purposeForm.id}`, {
+    id: purposeForm.id,
+    description: specificPurpose
+
+  })
 }
 
 const savePurpose = async () => {
@@ -296,6 +315,7 @@ onMounted(async () => {
                   v-model="desc.description"
                   class="purpose-description"
                   type="text"
+                  @click="updateSpecificRow(desc)"
                 >
                 <div class="button-holder">
                   <el-button
@@ -335,7 +355,7 @@ onMounted(async () => {
           <el-button
             type="primary"
             class="save-purpose"
-            @click="savePurpose()"
+            @click="isEdit ? updateSpecificPurpose() : savePurpose()"
           >
             Save
           </el-button>

@@ -67,7 +67,6 @@ const handlePurpose = (row: any) => {
 const getSpecficPurpose = async () => {
   const response = await api.get(`Documents/Purpose/${purposeForm.documentId}`)
   listOfPurpose.value = response.data
-  console.log('list of purpose', listOfPurpose.value)
 }
 const deleteSpecificPurpose = async () => {
   const response = await api.delete(`Documents/Purpose/${purposeForm.id}`)
@@ -84,24 +83,30 @@ const removeRow = async (desc: any, index: any) => {
 }
 
 const updateSpecificRow = async (index: any) => {
-  console.log('purpose id', index.id)
   isUpdatePurpose.value = true
-  console.log('is edit', isUpdatePurpose.value)
   purposeForm.id = index.id
-  purposeForm.purpose.map((purpose) => {
-    return { description: purpose.description }
-  })
+  purposeForm.description = index.description
 }
 
 const updateSpecificPurpose = async () => {
-  const specificPurpose = purposeForm.purpose.map((purpose) => {
-    return { description: purpose.description }
-  })
+  for (let purpose of listOfPurpose.value) {
+    if (purpose.id === purposeForm.id) {
+      purposeForm.description = purpose.description
+    }
+  }
   const response = await api.put(`Documents/Purpose/${purposeForm.id}`, {
     id: purposeForm.id,
-    description: specificPurpose
-
+    description: purposeForm.description
   })
+
+  if (response) {
+    ElMessage({
+      type: 'success',
+      message: 'Successfully updated!'
+    })
+  }
+
+  getSpecficPurpose()
 }
 
 const savePurpose = async () => {
@@ -355,7 +360,7 @@ onMounted(async () => {
           <el-button
             type="primary"
             class="save-purpose"
-            @click="isEdit ? updateSpecificPurpose() : savePurpose()"
+            @click="isUpdatePurpose ? updateSpecificPurpose() : savePurpose()"
           >
             Save
           </el-button>

@@ -1,14 +1,41 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, watch } from 'vue'
 import api from '@/services/apiService'
-import UserList from '@/components/UserList.vue'
 
 const user = reactive({
   userId: null
 })
 
+const documentSelect = ref(null)
+
+const purpose = reactive({
+  documentId: null
+})
+
 const userData = ref([])
-const getAllUsers = ref([])
+const requestDialog = ref(false)
+const documentsData = ref([])
+const documentPurposes = ref([])
+
+const handleRequest = () => {
+  requestDialog.value = true
+}
+
+const getAllDocuments = async () => {
+  const response = await api.get('/Documents')
+  documentsData.value = response.data
+}
+
+const getDocumentPurpose = async () => {
+  const documentId = documentSelect.value
+  console.log('documentId', documentId)
+  if (documentId) {
+    const response = await api.get(`Documents/Purpose/${documentId}`)
+    documentPurposes.value = response.data
+  } else {
+    documentPurposes.value = []
+  }
+}
 
 const getUsersById = async () => {
   const userId = sessionStorage.getItem('userId')
@@ -23,7 +50,10 @@ const getUsersById = async () => {
 
 onMounted(() => {
   getUsersById()
+  getAllDocuments()
+  getDocumentPurpose()
 })
+
 </script>
 
 <template>
@@ -97,7 +127,9 @@ onMounted(() => {
         </div>
         <div class="action-button-wrapper">
           <div class="button-content">
-            <button>Request Document</button>
+            <button @click="handleRequest()">
+              Request Now!
+            </button>
             <button>Upload Document</button>
             <button>Pay Here</button>
           </div>
@@ -123,12 +155,70 @@ onMounted(() => {
             </table>
           </div>
         </div>
+        <el-dialog
+          v-model="requestDialog"
+          title="Request a Document"
+        >
+          <select
+            ref="documentSelect"
+            class="select-field"
+          >
+            <option
+              disabled
+              selected
+              value=""
+            >
+              Select
+            </option>
+            <template v-for="documents in documentsData">
+              <option>{{ documents.documentName }}</option>
+            </template>
+          </select>
+          <select
+            id=""
+            class="select-field"
+          >
+            <option
+              disabled
+              selected
+              value=""
+            >
+              Purpose
+            </option>
+            <option
+              v-for="docpurpose in documentPurposes"
+              :key="docpurpose.id"
+            >
+              {{ docpurpose.description }}
+            </option>
+          </select>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="requestDialog = false">Cancel</el-button>
+              <el-button
+                type="primary"
+              >
+                Confirm
+              </el-button>
+            </span>
+          </template>
+        </el-dialog>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.select-field {
+  margin-bottom: 2rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  height: 50px;
+  width: 700px;
+  border: 1px solid #F48D2D;
+  overflow: none;
+  padding: 1rem;
+}
 .row-wrapper {
   width: 100%;
 }

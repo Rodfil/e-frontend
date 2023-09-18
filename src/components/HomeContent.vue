@@ -6,12 +6,7 @@ const user = reactive({
   userId: null
 })
 
-const documentSelect = ref(null)
-
-const purpose = reactive({
-  documentId: null
-})
-
+const selectedDocument = ref('Select')
 const userData = ref([])
 const requestDialog = ref(false)
 const documentsData = ref([])
@@ -27,10 +22,9 @@ const getAllDocuments = async () => {
 }
 
 const getDocumentPurpose = async () => {
-  const documentId = documentSelect.value
-  console.log('documentId', documentId)
-  if (documentId) {
-    const response = await api.get(`Documents/Purpose/${documentId}`)
+  if (selectedDocument.value) {
+    console.log('documentId', selectedDocument.value)
+    const response = await api.get(`Documents/Purpose/${selectedDocument.value}`)
     documentPurposes.value = response.data
   } else {
     documentPurposes.value = []
@@ -160,18 +154,23 @@ onMounted(() => {
           title="Request a Document"
         >
           <select
-            ref="documentSelect"
+            v-model="selectedDocument"
             class="select-field"
+            @change="getDocumentPurpose"
           >
             <option
               disabled
               selected
-              value=""
             >
               Select
             </option>
-            <template v-for="documents in documentsData">
-              <option>{{ documents.documentName }}</option>
+            <template
+              v-for="documents in documentsData"
+              :key="documents.documentId"
+            >
+              <option :value="documents.documentId">
+                {{ documents.documentName }}
+              </option>
             </template>
           </select>
           <select
@@ -181,13 +180,12 @@ onMounted(() => {
             <option
               disabled
               selected
-              value=""
             >
               Purpose
             </option>
             <option
               v-for="docpurpose in documentPurposes"
-              :key="docpurpose.id"
+              :key="docpurpose.documentId"
             >
               {{ docpurpose.description }}
             </option>

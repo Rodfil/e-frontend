@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, watch } from 'vue'
 import api from '@/services/apiService'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { v4 as uuidv4 } from 'uuid'
 
+const requestData = reactive({
+  userId: uuidv4,
+  documentId: uuidv4,
+  documentName: '',
+  purpose: '',
+  documentStatus: 0,
+  dateRequested: null
+})
 const user = reactive({
   userId: null
 })
 
-const selectedDocument = ref('Select')
+const selectedDocument = ref(null)
 const userData = ref([])
+const requestedDocument = ref([])
 const requestDialog = ref(false)
 const documentsData = ref([])
 const documentPurposes = ref([])
@@ -42,7 +53,30 @@ const getUsersById = async () => {
   }
 }
 
+const saveRequest = async () => {
+  requestData.documentId = selectedDocument.value
+  const date = new Date()
+  const formdata = {
+    userId: user.userId,
+    documentId: requestData.documentId,
+    purpose: requestData.purpose,
+    dateRequested: date
+  }
+  console.log('formData', formdata)
+  const response = await api.post('YourRequest', formdata)
+}
+
+const getRequestDocument = async () => {
+  const userId = sessionStorage.getItem('userId')
+
+  const response = await api.get(`YourRequest/${userId}`)
+
+  requestedDocument.value = response.data
+
+  console.log('request', response.data)
+}
 onMounted(() => {
+  getRequestDocument()
   getUsersById()
   getAllDocuments()
   getDocumentPurpose()
@@ -143,8 +177,11 @@ onMounted(() => {
                 <th>Status</th>
                 <th>Action</th>
               </tr>
-              <tr>
-                <td>dasdasdas</td>
+              <tr
+                v-for="request in requestedDocument"
+                :key="request.id"
+              >
+                <td>{{ request.documentName }}</td>
               </tr>
             </table>
           </div>
@@ -174,7 +211,7 @@ onMounted(() => {
             </template>
           </select>
           <select
-            id=""
+            v-model="requestData.purpose"
             class="select-field"
           >
             <option
@@ -185,7 +222,7 @@ onMounted(() => {
             </option>
             <option
               v-for="docpurpose in documentPurposes"
-              :key="docpurpose.documentId"
+              :key="docpurpose.id"
             >
               {{ docpurpose.description }}
             </option>
@@ -195,6 +232,7 @@ onMounted(() => {
               <el-button @click="requestDialog = false">Cancel</el-button>
               <el-button
                 type="primary"
+                @click="saveRequest()"
               >
                 Confirm
               </el-button>
